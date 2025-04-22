@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, CircularProgress } from '@mui/material';
-import { Chip } from '@mui/material';
+import React, { Suspense, useEffect, useState } from 'react';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, CircularProgress, Chip, Button } from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
 import { User } from '@/types/user';
 import { fetchWrapper } from '@/utils/fetch-wrapper';
 
@@ -38,40 +39,51 @@ const UserList: React.FC = () => {
     return (
         <div className="mb-6">
             <TableContainer component={Paper} className="shadow-lg rounded-xl">
-                <Table>
-                <TableHead className="bg-gray-100">
-                    <TableRow>
-                    <TableCell><strong>ID</strong></TableCell>
-                    <TableCell><strong>Name</strong></TableCell>
-                    <TableCell><strong>E-mail</strong></TableCell>
-                    <TableCell><strong>Type</strong></TableCell>
-                    <TableCell><strong>Created at</strong></TableCell>
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    {users.map((user) => (
-                    <TableRow key={user.id} className="hover:bg-gray-50 transition">
-                        <TableCell>{user.id}</TableCell>
-                        <TableCell>{user.name}</TableCell>
-                        <TableCell>{user.email}</TableCell>
-                        <TableCell>
-                            <Chip
-                                label={user.role}
-                                color={user.role === 'ADMIN' ? 'error' : 'primary'}
-                                variant="outlined"
-                            />
-                        </TableCell>
-                        <TableCell>
-                            {user.created_at ? 
-                                new Date(user.created_at).toLocaleDateString('pt-BR') 
-                            : 
-                                "N/A"
-                            }
-                        </TableCell>
-                    </TableRow>
-                    ))}
-                </TableBody>
-                </Table>
+                <Suspense fallback={<CircularProgress size={20} />}>
+                    <Table>
+                        <TableHead className="bg-gray-100">
+                            <TableRow>
+                                <TableCell><strong>ID</strong></TableCell>
+                                <TableCell><strong>Name</strong></TableCell>
+                                <TableCell><strong>E-mail</strong></TableCell>
+                                <TableCell><strong>Type</strong></TableCell>
+                                <TableCell><strong>Created at</strong></TableCell>
+                                <TableCell><strong>Actions</strong></TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {users.map((user) => (
+                                <TableRow key={user.id} className="hover:bg-gray-50 transition">
+                                    <TableCell>{user.id}</TableCell>
+                                    <TableCell>{user.name}</TableCell>
+                                    <TableCell>{user.email}</TableCell>
+                                    <TableCell>
+                                        <Chip
+                                            label={user.role}
+                                            color={user.role === 'ADMIN' ? 'error' : 'primary'}
+                                            variant="outlined"
+                                        />
+                                    </TableCell>
+                                    <TableCell>
+                                        {user.created_at ? 
+                                            new Date(user.created_at).toLocaleDateString('pt-BR') 
+                                        : 
+                                            "N/A"
+                                        }
+                                    </TableCell>
+                                    <TableCell sx={{ display: "flex", gap: 1 }}>
+                                        <Button variant="outlined" color="error">
+                                            <DeleteIcon />
+                                        </Button>
+                                        <Button variant="outlined" color="info">
+                                            <EditIcon />
+                                        </Button>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </Suspense>
             </TableContainer>
         </div>
     );

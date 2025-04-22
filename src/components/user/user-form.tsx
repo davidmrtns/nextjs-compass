@@ -1,7 +1,7 @@
 'use client';
 
 import { UserRole } from "@/types/user";
-import { useForm } from "react-hook-form";
+import { set, useForm } from "react-hook-form";
 import { MenuItem, TextField, Button, Typography, CircularProgress } from "@mui/material";
 import CustomAlert from "../custom-alert";
 import CustomSnackbar from "../custom-snackbar";
@@ -13,7 +13,7 @@ const UserForm: React.FC = () => {
     const [message, setMessage] = useState("");
     const [pending, setPending] = useState(false);
 
-    const { register, handleSubmit, formState: { errors } } = useForm();
+    const { register, handleSubmit, formState: { errors }, reset } = useForm();
     const roles = Object.values(UserRole);
 
     const onSubmit = async (data: any) => {
@@ -25,13 +25,14 @@ const UserForm: React.FC = () => {
                 body: JSON.stringify(data)
             });
             setMessage("User created successfully!");
+            reset();
         }catch(error){
             console.error('Error creating user:', error);
             setMessage(`Error creating user: ${error}`);
+        }finally{
+            setShowMessage(true);
+            setPending(false);
         }
-
-        setShowMessage(true);
-        setPending(false);
     };
 
     return(
