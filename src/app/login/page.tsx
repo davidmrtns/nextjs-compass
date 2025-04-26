@@ -1,5 +1,3 @@
-'use client';
-
 import { Container } from '@mui/material';
 import LoginForm from '@/components/login/login-form';
 

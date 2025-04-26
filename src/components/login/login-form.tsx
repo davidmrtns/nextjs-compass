@@ -1,3 +1,5 @@
+'use client';
+
 import { fetchWrapper } from "@/utils/fetch-wrapper";
 import { Box, Button, Paper, TextField, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
