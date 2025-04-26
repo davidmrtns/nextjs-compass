@@ -1,12 +1,14 @@
-import { PrismaClient } from "@/generated/prisma";
+import { createUser, getUsers } from "@/services/user.service";
 import bcrypt from "bcrypt";
 
-const prisma = new PrismaClient();
+export async function GET(request: Request) {
+    const { searchParams } = new URL(request.url);
+    const page = parseInt(searchParams.get("page") || "1", 10);
+    const pageSize = parseInt(searchParams.get("pageSize") || "10", 10);
 
-export async function GET() {
-    const users = await prisma.user.findMany();
+    const response = await getUsers(page, pageSize);
 
-    return new Response(JSON.stringify(users), {
+    return new Response(JSON.stringify(response), {
         status: 200,
         headers: {
             "Content-Type": "application/json",
@@ -17,19 +19,11 @@ export async function GET() {
 export async function POST(request: Request) {
     const body = await request.json();
     const { name, email, password, role } = body;
-
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const newUser = await prisma.user.create({
-        data: {
-            name: name,
-            email: email,
-            password: hashedPassword,
-            role: role
-        }
-    });
+    const response = await createUser(name, email, hashedPassword, role);
 
-    return new Response(JSON.stringify(newUser), {
+    return new Response(JSON.stringify(response), {
         status: 201,
         headers: {
             "Content-Type": "application/json",

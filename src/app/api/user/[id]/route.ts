@@ -1,4 +1,5 @@
 import { PrismaClient } from "@/generated/prisma";
+import { deleteUser, getUser, updateUser } from "@/services/user.service";
 import bcrypt from "bcrypt";
 
 const prisma = new PrismaClient();
@@ -7,14 +8,12 @@ export async function GET(
     request: Request,
     context: { params: { id: string } }
 ) {
-    const id = parseInt(context.params.id);
-    const user = await prisma.user.findUnique({
-        where: {
-            id: id
-        }
-    });
+    const { params } = await context;
+    const id = parseInt(params.id);
 
-    return new Response(JSON.stringify(user), {
+    const response = await getUser(id);
+
+    return new Response(JSON.stringify(response), {
         status: 200,
         headers: {
             "Content-Type": "application/json",
@@ -26,24 +25,15 @@ export async function PUT(
     request: Request,
     context: { params: { id: string } }
 ) {
+    const { params } = await context;
+    const id = parseInt(params.id);
     const body = await request.json();
     const { name, email, password } = body;
-    const id = parseInt(context.params.id);
-
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const updatedUser = await prisma.user.update({
-        where: {
-            id: id
-        },
-        data: {
-            name: name,
-            email: email,
-            password: hashedPassword,
-        }
-    });
+    const response = await updateUser(id, name, email, hashedPassword);
 
-    return new Response(JSON.stringify(updatedUser), {
+    return new Response(JSON.stringify(response), {
         status: 200,
         headers: {
             "Content-Type": "application/json",
@@ -55,17 +45,25 @@ export async function DELETE(
     request: Request,
     context: { params: { id: string } }
 ) {
-    const id = parseInt(context.params.id);
-    await prisma.user.delete({
-        where: {
-            id: id
-        }
-    });
+    const { params } = await context;
+    const id = parseInt(params.id);
 
-    return new Response(JSON.stringify({ message: "User deleted" }), {
-        status: 200,
-        headers: {
-            "Content-Type": "application/json",
-        },
-    });
+    try{
+        await deleteUser(id);
+
+        return new Response(JSON.stringify({ message: "User deleted" }), {
+            status: 200,
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+    }catch(e){
+        return new Response(JSON.stringify({ message: "Error deleting user" }), {
+            status: 500,
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+    }
+    
 }
