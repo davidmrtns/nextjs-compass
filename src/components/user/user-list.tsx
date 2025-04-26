@@ -2,15 +2,17 @@ import React from 'react';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, CircularProgress, Chip, Button, Box } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 import { getUsers } from '@/services/user.service';
 import PaginationControls from '../pagination-controls';
+import Link from 'next/link';
 
 interface UserListProps {
     page?: number;
     pageSize?: number;
 }
 
-const UserList: React.FC<UserListProps> = async ({ page = 1, pageSize = 10 }) => {
+const UserList: React.FC<UserListProps> = async ({ page = 1, pageSize = 3 }) => {
     await new Promise((resolve) => setTimeout(resolve, 5000));
     const { users, total } = await getUsers(page, pageSize);
 
@@ -48,13 +50,14 @@ const UserList: React.FC<UserListProps> = async ({ page = 1, pageSize = 10 }) =>
                                         "N/A"
                                     }
                                 </TableCell>
-                                <TableCell sx={{ display: "flex", gap: 1 }}>
-                                    <Button variant="outlined" color="error">
-                                        <DeleteIcon />
-                                    </Button>
-                                    <Button variant="outlined" color="info">
-                                        <EditIcon />
-                                    </Button>
+                                <TableCell>
+                                    <Box sx={{ display: "flex", gap: 1 }}>
+                                        <Link href={`/users/${user.id}`} passHref>
+                                            <VisibilityIcon color='primary' />
+                                        </Link>
+                                        <EditIcon color='primary' />
+                                        <DeleteIcon color='error' />
+                                    </Box>
                                 </TableCell>
                             </TableRow>
                         ))}
