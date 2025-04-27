@@ -1,5 +1,5 @@
 import bcrypt from "bcrypt";
-import { generateToken } from "@/utils/token.service";
+import { generateToken } from "@/utils/token-utils";
 import { getUserByEmail } from "@/services/user.service";
 
 export async function POST(request: Request) {
