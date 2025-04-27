@@ -1,30 +1,10 @@
-'use client';
-
-import { rootRoute } from '@/middleware';
-import { fetchWrapper } from '@/utils/fetch-wrapper';
+import { UserRole } from '@/types/user';
+import { getDecodedToken } from '@/utils/token-utils';
 import { AppBar, Toolbar, Button, Typography } from '@mui/material';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import CustomSnackbar from './custom-snackbar';
-import { useState } from 'react';
 
-const Navbar = () => {
-    const [showMessage, setShowMessage] = useState(false);
-    const [message, setMessage] = useState("");
-    
-    const router = useRouter();
-
-    const logout = async () => {
-        try {
-            await fetchWrapper<any>('/auth/logout', {
-                method: 'POST'
-            });
-
-            router.push(rootRoute);
-        } catch (error) {
-            setMessage(`An error occurred during logout: ${error}`);
-        }
-    };
+const Navbar: React.FC = async () => {
+    const decodedToken = await getDecodedToken();
 
     return (
         <AppBar position="static" className="bg-blue-600">
@@ -32,16 +12,29 @@ const Navbar = () => {
                 <Typography variant="h6" className="flex-1">
                     <Link href="/" passHref>Next.js Compass</Link>
                 </Typography>
-                <Link href="/users" passHref>
-                    <Button color="inherit" className="hover:bg-blue-700">
-                        Users
-                    </Button>
-                </Link>
-                <Button onClick={() => logout()} color="inherit" className="hover:bg-blue-700">
-                    Logout
-                </Button>
+                {decodedToken ? (
+                    <>
+                        {decodedToken.payload.role === UserRole.ADMIN && (
+                            <Link href="/users" passHref>
+                                <Button color="inherit" className="hover:bg-blue-700">
+                                    Users
+                                </Button>
+                            </Link>
+                        )}
+                        <form action="/api/auth/logout" method="POST">
+                            <Button type="submit" color="inherit" className="hover:bg-blue-700">
+                                Logout
+                            </Button>
+                        </form>
+                    </>
+                ) : (
+                    <Link href="/login" passHref>
+                        <Button color="inherit" className="hover:bg-blue-700">
+                            Login
+                        </Button>
+                    </Link>
+                )}
             </Toolbar>
-            <CustomSnackbar type="error" message={message} open={showMessage} handleClose={() => setShowMessage(false)} />
         </AppBar>
     );
 };
