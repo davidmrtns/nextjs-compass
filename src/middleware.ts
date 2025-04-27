@@ -40,7 +40,7 @@ export async function middleware(request: NextRequest) {
     // se não houver token, redireciona para a página de login
     if (!token) {
         if(pathname.startsWith(apiRoute)){
-            return NextResponse.json({ error: 'Token não encontrado' }, { status: 401 });
+            return NextResponse.json({ error: 'Token not found' }, { status: 401 });
         }
         return NextResponse.redirect(new URL(loginRoute, request.url));
     }
@@ -60,7 +60,7 @@ export async function middleware(request: NextRequest) {
         return NextResponse.next();
     } catch (err) {
         if(pathname.startsWith(apiRoute)){
-            return NextResponse.json({ error: 'Não foi possível validar o token' }, { status: 401 });
+            return NextResponse.json({ error: 'Could not validate token' }, { status: 401 });
         }
         return NextResponse.redirect(new URL(loginRoute, request.url));
     }
