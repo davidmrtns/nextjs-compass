@@ -17,7 +17,8 @@ const LoginForm: React.FC = () => {
                 body: JSON.stringify(data)
             });
 
-            router.push('/');
+            // redirecionamento sem router para forçar atualização da navbar
+            window.location.href = '/';
         }catch(error){
             console.error('Login error:', error);
         }
